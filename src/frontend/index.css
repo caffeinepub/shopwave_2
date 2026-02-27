@@ -1,0 +1,266 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap');
+
+@layer base {
+  :root {
+    --radius: 0.75rem;
+
+    /* === MarketPlace Design Tokens === */
+    /* Coral accent: oklch(0.65 0.22 28) ≈ #FF6B6B */
+    --coral: 0.65 0.22 28;
+    --coral-dark: 0.55 0.22 28;
+    --coral-light: 0.90 0.08 28;
+    --coral-muted: 0.94 0.04 28;
+
+    /* Warm off-white backgrounds */
+    --background: 0.988 0.004 85;
+    --foreground: 0.15 0.02 260;
+
+    /* Card: pure white */
+    --card: 1 0 0;
+    --card-foreground: 0.15 0.02 260;
+
+    /* Popover */
+    --popover: 1 0 0;
+    --popover-foreground: 0.15 0.02 260;
+
+    /* Primary = Coral */
+    --primary: 0.65 0.22 28;
+    --primary-foreground: 1 0 0;
+
+    /* Secondary = light warm grey */
+    --secondary: 0.96 0.008 85;
+    --secondary-foreground: 0.3 0.02 260;
+
+    /* Muted */
+    --muted: 0.96 0.006 85;
+    --muted-foreground: 0.52 0.02 260;
+
+    /* Accent = coral light */
+    --accent: 0.94 0.05 28;
+    --accent-foreground: 0.55 0.22 28;
+
+    /* Destructive */
+    --destructive: 0.577 0.245 27.325;
+    --destructive-foreground: 0.985 0 0;
+
+    /* Borders */
+    --border: 0.9 0.008 85;
+    --input: 0.92 0.008 85;
+    --ring: 0.65 0.22 28;
+
+    /* Charts */
+    --chart-1: 0.65 0.22 28;
+    --chart-2: 0.6 0.118 184.704;
+    --chart-3: 0.398 0.07 227.392;
+    --chart-4: 0.828 0.189 84.429;
+    --chart-5: 0.769 0.188 70.08;
+
+    /* Sidebar */
+    --sidebar: 0.985 0.003 85;
+    --sidebar-foreground: 0.15 0.02 260;
+    --sidebar-primary: 0.65 0.22 28;
+    --sidebar-primary-foreground: 1 0 0;
+    --sidebar-accent: 0.94 0.05 28;
+    --sidebar-accent-foreground: 0.55 0.22 28;
+    --sidebar-border: 0.9 0.008 85;
+    --sidebar-ring: 0.65 0.22 28;
+
+    /* Custom shadows */
+    --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.07);
+    --shadow-card-hover: 0 8px 28px rgba(0, 0, 0, 0.13);
+    --shadow-nav: 0 1px 0 rgba(0, 0, 0, 0.06);
+  }
+
+  .dark {
+    --background: 0.12 0.01 260;
+    --foreground: 0.96 0.005 85;
+    --card: 0.17 0.015 260;
+    --card-foreground: 0.96 0.005 85;
+    --popover: 0.2 0.015 260;
+    --popover-foreground: 0.96 0.005 85;
+    --primary: 0.65 0.22 28;
+    --primary-foreground: 1 0 0;
+    --secondary: 0.22 0.015 260;
+    --secondary-foreground: 0.85 0.005 85;
+    --muted: 0.22 0.015 260;
+    --muted-foreground: 0.6 0.015 260;
+    --accent: 0.25 0.05 28;
+    --accent-foreground: 0.75 0.18 28;
+    --destructive: 0.704 0.191 22.216;
+    --destructive-foreground: 0.205 0 0;
+    --border: 1 0 0 / 10%;
+    --input: 1 0 0 / 15%;
+    --ring: 0.65 0.22 28;
+    --chart-1: 0.65 0.22 28;
+    --chart-2: 0.696 0.17 162.48;
+    --chart-3: 0.769 0.188 70.08;
+    --chart-4: 0.627 0.265 303.9;
+    --chart-5: 0.645 0.246 16.439;
+    --sidebar: 0.17 0.015 260;
+    --sidebar-foreground: 0.96 0.005 85;
+    --sidebar-primary: 0.65 0.22 28;
+    --sidebar-primary-foreground: 1 0 0;
+    --sidebar-accent: 0.25 0.05 28;
+    --sidebar-accent-foreground: 0.75 0.18 28;
+    --sidebar-border: 1 0 0 / 10%;
+    --sidebar-ring: 0.65 0.22 28;
+  }
+
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Sora', system-ui, sans-serif;
+    font-weight: 700;
+  }
+}
+
+@layer components {
+  /* === Product Card === */
+  .product-card {
+    @apply bg-card rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer;
+    box-shadow: var(--shadow-card);
+  }
+  .product-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  /* === Coral CTA Button === */
+  .btn-coral {
+    @apply bg-primary text-primary-foreground rounded-xl px-5 py-2.5 font-semibold text-sm transition-all duration-200;
+    font-family: 'Sora', system-ui, sans-serif;
+  }
+  .btn-coral:hover:not(:disabled) {
+    @apply bg-primary opacity-90;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px oklch(var(--coral) / 0.35);
+  }
+  .btn-coral:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  .btn-coral:disabled {
+    @apply opacity-60 cursor-not-allowed;
+  }
+
+  /* === Category Chip === */
+  .category-chip {
+    @apply px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer;
+    font-family: 'Sora', system-ui, sans-serif;
+  }
+  .category-chip.active {
+    @apply bg-primary text-primary-foreground;
+    box-shadow: 0 2px 10px oklch(var(--coral) / 0.3);
+  }
+  .category-chip:not(.active) {
+    @apply bg-secondary text-secondary-foreground;
+  }
+  .category-chip:not(.active):hover {
+    @apply bg-accent text-accent-foreground;
+  }
+
+  /* === Cart Drawer Overlay === */
+  .cart-overlay {
+    @apply fixed inset-0 bg-black/40 backdrop-blur-sm z-40;
+    animation: fadeIn 0.2s ease;
+  }
+
+  /* === Cart Drawer Panel === */
+  .cart-drawer {
+    @apply fixed right-0 top-0 h-full w-full sm:w-[420px] bg-card z-50 flex flex-col;
+    box-shadow: -8px 0 40px rgba(0, 0, 0, 0.12);
+    animation: slideInRight 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  /* === Page fade-in === */
+  .page-enter {
+    animation: fadeInUp 0.4s ease both;
+  }
+
+  /* === Loading skeleton pulse === */
+  .skeleton {
+    @apply bg-muted rounded-lg;
+    animation: skeletonPulse 1.6s ease-in-out infinite;
+  }
+}
+
+@layer utilities {
+  .text-coral {
+    color: oklch(var(--coral));
+  }
+  .bg-coral {
+    background-color: oklch(var(--coral));
+  }
+  .border-coral {
+    border-color: oklch(var(--coral));
+  }
+  .ring-coral {
+    --tw-ring-color: oklch(var(--coral));
+  }
+}
+
+/* === Keyframe Animations === */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* === Staggered grid items === */
+.product-grid-item {
+  animation: fadeInUp 0.4s ease both;
+}
+.product-grid-item:nth-child(1) { animation-delay: 0.05s; }
+.product-grid-item:nth-child(2) { animation-delay: 0.10s; }
+.product-grid-item:nth-child(3) { animation-delay: 0.15s; }
+.product-grid-item:nth-child(4) { animation-delay: 0.20s; }
+.product-grid-item:nth-child(5) { animation-delay: 0.25s; }
+.product-grid-item:nth-child(6) { animation-delay: 0.30s; }
+.product-grid-item:nth-child(7) { animation-delay: 0.35s; }
+.product-grid-item:nth-child(8) { animation-delay: 0.40s; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: oklch(var(--muted-foreground) / 0.3); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: oklch(var(--muted-foreground) / 0.5); }
