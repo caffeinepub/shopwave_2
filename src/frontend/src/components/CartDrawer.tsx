@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { X, ShoppingBag, Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
+import { X, ShoppingBag, Minus, Plus, Trash2, ShoppingCart, LogIn } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
@@ -10,6 +10,7 @@ import {
   useClearCart,
 } from "../hooks/useQueries";
 import type { CartItem, ProductOutput } from "../backend.d";
+import { useAuth } from "../hooks/useAuth";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -145,6 +146,7 @@ function CartItemRow({
 }
 
 export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
+  const { isLoggedIn, login } = useAuth();
   const { data: cartItems, isLoading: cartLoading } = useGetCallerCart();
   const { data: allProducts } = useGetAllProducts();
   const clearCart = useClearCart();
@@ -165,6 +167,71 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
+
+  // Login gate — render minimal drawer with sign-in prompt
+  if (!isLoggedIn) {
+    return (
+      <>
+        {/* Overlay */}
+        <button
+          type="button"
+          className="cart-overlay"
+          onClick={onClose}
+          aria-label="Close cart"
+          style={{ cursor: "default" }}
+        />
+
+        {/* Drawer Panel */}
+        <aside className="cart-drawer" aria-label="Shopping cart">
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
+            <div className="flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5 text-primary" />
+              <h2
+                className="text-base font-bold text-foreground"
+                style={{ fontFamily: "Sora, system-ui, sans-serif" }}
+              >
+                Your Cart
+              </h2>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground"
+              aria-label="Close cart"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Sign-in prompt */}
+          <div className="flex-1 flex flex-col items-center justify-center px-5 py-16 text-center">
+            <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center mb-4">
+              <ShoppingBag className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h3
+              className="text-base font-bold text-foreground mb-2"
+              style={{ fontFamily: "Sora, system-ui, sans-serif" }}
+            >
+              Sign in to shop
+            </h3>
+            <p className="text-sm text-muted-foreground mb-6 leading-relaxed max-w-[220px]">
+              Create an account or sign in to add items and manage your cart.
+            </p>
+            <button
+              type="button"
+              onClick={login}
+              className="btn-coral inline-flex items-center gap-2"
+              style={{ fontFamily: "Sora, system-ui, sans-serif" }}
+            >
+              <LogIn className="w-4 h-4" />
+              Sign In
+            </button>
+          </div>
+        </aside>
+      </>
+    );
+  }
 
   const productMap = new Map<string, ProductOutput>(
     (allProducts ?? []).map((p) => [p.id, p])

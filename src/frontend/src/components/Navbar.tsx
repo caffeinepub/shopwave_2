@@ -1,7 +1,9 @@
 import { useState, useCallback } from "react";
-import { ShoppingCart, Search, Store, X } from "lucide-react";
+import { ShoppingCart, Search, Store, X, User, LogOut, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { useGetCartItemCount } from "../hooks/useQueries";
+import { useAuth } from "../hooks/useAuth";
 
 interface NavbarProps {
   onSearchChange: (query: string) => void;
@@ -17,12 +19,26 @@ export default function Navbar({
   const navigate = useNavigate();
   const { data: cartCount } = useGetCartItemCount();
   const [focused, setFocused] = useState(false);
+  const { isLoggedIn, login, logout, principal, isInitializing } = useAuth();
 
   const handleClear = useCallback(() => {
     onSearchChange("");
   }, [onSearchChange]);
 
   const count = cartCount ? Number(cartCount) : 0;
+
+  const handleCartOpen = () => {
+    if (!isLoggedIn) {
+      toast.info("Sign in to view your cart");
+      login();
+      return;
+    }
+    onCartOpen();
+  };
+
+  const principalShort = principal
+    ? `${principal.toString().slice(0, 4)}...`
+    : "";
 
   return (
     <header className="sticky top-0 z-30 bg-card/95 backdrop-blur-md border-b border-border shadow-nav">
@@ -75,13 +91,14 @@ export default function Navbar({
           {/* Cart */}
           <button
             type="button"
-            onClick={onCartOpen}
+            onClick={handleCartOpen}
             className="relative p-2.5 rounded-xl hover:bg-secondary transition-colors group"
-            aria-label={`Cart (${count} items)`}
+            aria-label={isLoggedIn ? `Cart (${count} items)` : "Sign in to view cart"}
           >
             <ShoppingCart className="w-5 h-5 text-foreground group-hover:text-primary transition-colors" />
-            {count > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center leading-none"
+            {isLoggedIn && count > 0 && (
+              <span
+                className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center leading-none"
                 style={{ fontFamily: "Sora, system-ui, sans-serif" }}
               >
                 {count > 99 ? "99+" : count}
@@ -108,6 +125,46 @@ export default function Navbar({
           >
             <span className="text-lg font-bold leading-none">+</span>
           </button>
+
+          {/* Auth button */}
+          {isInitializing ? (
+            <div className="w-8 h-8 flex items-center justify-center">
+              <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+            </div>
+          ) : isLoggedIn ? (
+            <div className="flex items-center gap-1.5">
+              {/* Principal chip */}
+              <div
+                className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 bg-secondary rounded-xl text-xs font-semibold text-foreground"
+                style={{ fontFamily: "Sora, system-ui, sans-serif" }}
+              >
+                <div className="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center">
+                  <User className="w-2.5 h-2.5 text-primary" />
+                </div>
+                {principalShort}
+              </div>
+              {/* Logout */}
+              <button
+                type="button"
+                onClick={logout}
+                className="p-2.5 rounded-xl hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground group"
+                aria-label="Sign out"
+                title="Sign out"
+              >
+                <LogOut className="w-4 h-4 group-hover:text-destructive transition-colors" />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={login}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-border hover:bg-secondary text-sm font-semibold text-foreground transition-all duration-200"
+              style={{ fontFamily: "Sora, system-ui, sans-serif" }}
+            >
+              <User className="w-4 h-4" />
+              <span className="hidden sm:block">Sign In</span>
+            </button>
+          )}
         </div>
       </div>
     </header>

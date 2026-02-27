@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { ShoppingCart, Check, User } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { toast } from "sonner";
 import type { ProductOutput } from "../backend.d";
 import { useAddToCart } from "../hooks/useQueries";
+import { useAuth } from "../hooks/useAuth";
 
 interface ProductCardProps {
   product: ProductOutput;
@@ -19,11 +21,17 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const addToCart = useAddToCart();
+  const { isLoggedIn, login } = useAuth();
   const [added, setAdded] = useState(false);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (added || addToCart.isPending) return;
+    if (!isLoggedIn) {
+      toast.info("Sign in to add items to your cart");
+      login();
+      return;
+    }
     try {
       await addToCart.mutateAsync({ productId: product.id, quantity: BigInt(1) });
       setAdded(true);

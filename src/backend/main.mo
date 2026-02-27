@@ -14,15 +14,17 @@ import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-import Migration "migration";
 
-(with migration = Migration.run)
+import Int "mo:core/Int";
+
+// Migration specification
+
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
   include MixinStorage();
 
-  type Product = {
+  public type Product = {
     id : Text;
     name : Text;
     description : Text;
@@ -164,6 +166,10 @@ actor {
   };
 
   public shared ({ caller }) func addToCart(productId : Text, quantity : Nat) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add items to cart");
+    };
+
     switch (products.get(productId)) {
       case (null) { Runtime.trap("Product not found") };
       case (?_) {
@@ -201,6 +207,10 @@ actor {
   };
 
   public shared ({ caller }) func removeFromCart(productId : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can remove items from cart");
+    };
+
     switch (carts.get(caller)) {
       case (null) { Runtime.trap("Cart not found") };
       case (?cart) {
@@ -213,6 +223,10 @@ actor {
   };
 
   public shared ({ caller }) func updateCartItem(productId : Text, quantity : Nat) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update cart items");
+    };
+
     if (quantity == 0) {
       return await removeFromCart(productId);
     };
@@ -235,6 +249,10 @@ actor {
   };
 
   public query ({ caller }) func getCallerCart() : async CartOutput {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view their cart");
+    };
+
     let cart = switch (carts.get(caller)) {
       case (null) { List.empty<CartItem>() };
       case (?existingCart) { existingCart };
@@ -243,10 +261,18 @@ actor {
   };
 
   public shared ({ caller }) func clearCallerCart() : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can clear their cart");
+    };
+
     carts.remove(caller);
   };
 
   public query ({ caller }) func getCallerCartItemCount() : async Nat {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view their cart count");
+    };
+
     switch (carts.get(caller)) {
       case (null) { 0 };
       case (?cart) {
@@ -280,3 +306,4 @@ actor {
     Time.now();
   };
 };
+

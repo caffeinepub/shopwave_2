@@ -64,7 +64,7 @@ export function useCreateProduct() {
       return actor.createProduct(productInput);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.refetchQueries({ queryKey: ["products", "all"] });
     },
   });
 }

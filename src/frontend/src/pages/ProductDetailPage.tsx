@@ -12,6 +12,7 @@ import {
 import { toast } from "sonner";
 import { useGetProduct } from "../hooks/useQueries";
 import { useAddToCart } from "../hooks/useQueries";
+import { useAuth } from "../hooks/useAuth";
 
 interface ProductDetailPageProps {
   productId: string;
@@ -29,10 +30,16 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default function ProductDetailPage({ productId }: ProductDetailPageProps) {
   const { data: product, isLoading, isError } = useGetProduct(productId);
   const addToCart = useAddToCart();
+  const { isLoggedIn, login } = useAuth();
   const [added, setAdded] = useState(false);
 
   const handleAddToCart = async () => {
     if (added || addToCart.isPending || !product) return;
+    if (!isLoggedIn) {
+      toast.info("Sign in to add items to your cart");
+      login();
+      return;
+    }
     try {
       await addToCart.mutateAsync({ productId: product.id, quantity: BigInt(1) });
       setAdded(true);

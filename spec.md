@@ -1,22 +1,36 @@
 # ShopWave
 
 ## Current State
-E-commerce marketplace where sellers can list products with images and buyers can browse, search, filter by category, and manage a cart. The backend uses blob-storage for images and has authorization/access-control mixins included. The `createProduct` endpoint currently checks for `#user` permission, which blocks all anonymous visitors from listing products (causing the "Failed to list" error).
+
+ShopWave is a marketplace where anyone can list products (no login required) and browse/search/filter by category. The cart is functional but gated to users with the `#user` role in the backend. Currently there is no login flow in the UI, so the cart and product listing work only for anonymous visitors where the backend allows it. The authorization component is already installed.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Nothing new
+- Internet Identity login button in the Navbar (shows "Sign In" when logged out, shows user initials/principal + logout when logged in)
+- On first login, automatically call `assignCallerUserRole` to assign `#user` role so the caller can use cart APIs
+- A `useAuth` context/hook wrapping `InternetIdentityProvider` so any component can check `isLoggedIn`
+- Prompt to sign in when an anonymous user tries to add to cart or view the cart
 
 ### Modify
-- Remove the `#user` authorization check from `createProduct` so any visitor (including anonymous principals) can list a product without needing to log in
+- Navbar: add login/logout button on the right side
+- CartDrawer: show "Sign in to use your cart" message for anonymous visitors instead of cart contents
+- ProductDetailPage and ProductCard: show "Sign in to add to cart" instead of silently failing for anonymous users
+- SellPage: allow listing without login (already working) -- no change needed
 
 ### Remove
-- The `Runtime.trap("Unauthorized: Only users can create products")` guard in `createProduct`
+Nothing
 
 ## Implementation Plan
-1. Regenerate the backend without the authorization guard on `createProduct` -- all other functions stay the same
-2. No frontend changes needed
+1. Wrap `main.tsx` with `InternetIdentityProvider`
+2. Create `useAuth` hook that exposes `{ isLoggedIn, identity, login, logout, principal }` using `useInternetIdentity`
+3. After successful login, call `backend.assignCallerUserRole(principal, UserRole.user)` so the user's cart APIs work
+4. Add login/logout button to Navbar
+5. In CartDrawer, gate content behind login check -- show sign-in prompt for anonymous users
+6. In ProductCard and ProductDetailPage add-to-cart buttons, show sign-in prompt toast if not logged in
 
 ## UX Notes
-- No visible UI changes; the sell form will simply work instead of throwing an error
+- Login flow opens Internet Identity in a popup
+- After login the user is returned to the same page, cart count reloads automatically
+- Logout clears local identity; cart count resets to 0
+- The sell form remains accessible to everyone (anonymous listing already works)
